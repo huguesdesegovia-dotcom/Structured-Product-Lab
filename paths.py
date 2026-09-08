@@ -22,6 +22,29 @@ def simulate_gbm_paths(S0, T, r, sigma, n_steps, n_simulations, seed=None):
 
     return paths
 
+def simulate_gbm_paths_antithetic(S0, T, r, sigma, n_steps, n_simulations, seed=None):
+    """
+    Simule des trajectoires GBM avec variables antithetiques.
+
+    Les n_simulations/2 premieres lignes utilisent Z, les suivantes -Z.
+    La ligne i et la ligne i + n_simulations//2 forment une paire.
+    """
+    dt = T / n_steps
+    rng = np.random.default_rng(seed)
+
+    half = n_simulations // 2
+    Z_half = rng.standard_normal((half, n_steps))
+    Z = np.concatenate([Z_half, -Z_half], axis=0)
+
+    paths = np.empty((2 * half, n_steps + 1))
+    paths[:, 0] = S0
+
+    for t in range(1, n_steps + 1):
+        paths[:, t] = paths[:, t - 1] * np.exp(
+            (r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * Z[:, t - 1]
+        )
+
+    return paths
 
 if __name__ == "__main__":
     # Test visuel : 5 trajectoires, 5 pas
@@ -41,3 +64,4 @@ if __name__ == "__main__":
     for t in [50, 100, 150, 200, 252]:
         esp = np.exp(-0.05 * t * dt) * p_big[:, t].mean()
         print(f"t={t:3d}  E[S_t] actualise = {esp:.3f}")
+
