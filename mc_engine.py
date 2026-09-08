@@ -35,6 +35,24 @@ def monte_carlo_price_antithetic(payoffs, r, T, confidence=0.95):
 
     return price, se, ci
 
+def monte_carlo_price_control_variate(payoffs, S_T, S0, r, T, confidence=0.95):
+    """
+    Prix Monte Carlo avec variable de controle sur le sous-jacent actualise.
+    """
+    disc = np.exp(-r * T)
+    Y = payoffs * disc
+    X = S_T * disc
+
+    c = np.cov(X, Y, ddof=1)[0, 1] / np.var(X, ddof=1)
+    Y_cv = Y - c * (X - S0)
+
+    price = Y_cv.mean()
+    se = Y_cv.std(ddof=1) / np.sqrt(len(Y_cv))
+    z = norm.ppf(0.5 + confidence / 2)
+    ci = (price - z * se, price + z * se)
+
+    return price, se, ci, c
+
 if __name__ == "__main__":
     from paths import simulate_gbm_paths, simulate_gbm_paths_antithetic
 
@@ -56,3 +74,11 @@ if __name__ == "__main__":
     print(f"MC antithetique         = {price_anti:.4f}  SE = {se_anti:.4f}")
     print(f"Reduction du SE         = {se_std / se_anti:.2f}x")
     print(f"Gain en simulations     = {(se_std / se_anti)**2:.1f}x")
+
+    S_T_std = p_std[:, -1]
+    price_cv, se_cv, ci_cv, c = monte_carlo_price_control_variate(
+        payoffs_std, S_T_std, S0=100, r=0.05, T=1
+    )
+    print(f"MC control variate      = {price_cv:.4f}  SE = {se_cv:.4f}")
+    print(f"Coefficient c*          = {c:.4f}")
+    print(f"Reduction vs standard   = {se_std / se_cv:.2f}x")
