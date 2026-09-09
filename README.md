@@ -4,10 +4,6 @@
 
 Monte Carlo pricing of barrier options and autocallables, with variance reduction and model risk analysis.
 
-## Live Demo
-
-Add your Streamlit Cloud URL here once deployed.
-
 ## Overview
 
 This project prices path-dependent structured products that have no closed-form solution — barrier options and autocallables — using Monte Carlo simulation under a geometric Brownian motion. It implements two variance reduction techniques, measures the discretization bias on barrier monitoring, and quantifies model risk against the statistical error of the estimator.
