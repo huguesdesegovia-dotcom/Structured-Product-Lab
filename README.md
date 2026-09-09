@@ -1,6 +1,6 @@
 # Structured Product Lab
 
-🚀 **[Live Demo](https://ton-url.streamlit.app)**
+🚀 **[Live Demo](https://structured-appuct-lab-qqdtpjfr6gawftzzobih9x.streamlit.app)**
 
 Monte Carlo pricing of barrier options and autocallables, with variance reduction and model risk analysis.
 
